@@ -1,46 +1,50 @@
-# Getting Started with Create React App
+# Undo experiment 2
 
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+This project is an experiment to implement the ideas described here:
 
-## Available Scripts
+https://github.com/zaboople/klonk/blob/master/TheGURQ.md
 
-In the project directory, you can run:
+The application is a simple grid that the user can "edit". Edit operations include:
 
-### `npm start`
+1. Writing a character to a cell.
+2. Insert a row/column.
+3. Delete a row/column.
+4. Undo the last edit operation (using Ctrl-z).
+5. Redo the last undo (using Ctrl-y).
 
-Runs the app in the development mode.\
-Open [http://localhost:3000](http://localhost:3000) to view it in the browser.
+The user can move a cursor using the arrow keys. Cursor moves are not undoable.
 
-The page will reload if you make edits.\
-You will also see any lint errors in the console.
+The experiment aims to demonstrate a method for implementing undo/redo that is
+easy for users to understand and allows them to return to any previous state,
+regardless of the undo/redo actions taken. This is different from traditional
+undo methods, where it can be difficult to recover a previous state if an action
+is taken after undoing.
 
-### `npm test`
+## Undoing user operations
 
-Launches the test runner in the interactive watch mode.\
-See the section about [running tests](https://facebook.github.io/create-react-app/docs/running-tests) for more information.
+I tried two different approaches to undoing individual user operations. Hence
+there are two undo experiments (in separate GitHub repos). The two approaches
+are:
 
-### `npm run build`
+### Undo experiment 1
 
-Builds the app for production to the `build` folder.\
-It correctly bundles React in production mode and optimizes the build for the best performance.
+Take a copy of the current grid state before making any changes. To undo the
+operation, revert to the stored copy.
+   
+While this may seem like it would use a lot of memory, I can use immutable data
+and take advantage of "structural sharing" to avoid multiple copies of parts of
+the state that do not change.
 
-The build is minified and the filenames include the hashes.\
-Your app is ready to be deployed!
+For the purpose of this experiment, the data representation I use is not
+optimized for structural sharing, but it's fine as a proof of concept.
 
-See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
+### Undo experiment 2 (this repo)
 
-### `npm run eject`
+For each possible operation that changes the grid state, calculate the sequence
+of operations needed to restore the original grid state. This should be more
+efficient than approach 1 in terms of memory usage. However, it is more
+complicated to implement, and it's easy to make a mistake in undo calculation,
+so that undo does not restore the state correctly.
 
-**Note: this is a one-way operation. Once you `eject`, you can’t go back!**
-
-If you aren’t satisfied with the build tool and configuration choices, you can `eject` at any time. This command will remove the single build dependency from your project.
-
-Instead, it will copy all the configuration files and the transitive dependencies (webpack, Babel, ESLint, etc) right into your project so you have full control over them. All of the commands except `eject` will still work, but they will point to the copied scripts so you can tweak them. At this point you’re on your own.
-
-You don’t have to ever use `eject`. The curated feature set is suitable for small and middle deployments, and you shouldn’t feel obligated to use this feature. However we understand that this tool wouldn’t be useful if you couldn’t customize it when you are ready for it.
-
-## Learn More
-
-You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
-
-To learn React, check out the [React documentation](https://reactjs.org/).
+I am more familar with approach 2. I'm not sure how well approach 1 would scale
+in a "real" application.
